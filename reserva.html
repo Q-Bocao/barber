@@ -15,30 +15,34 @@
       <p>Completá los datos para agendar tu cita</p>
     </div>
   </header>
+
   <section class="booking">
-    <form id="form-reserva">
+    <form id="form-reserva" onsubmit="return false;">
       <input type="text" id="nombre" placeholder="Tu nombre" required>
+
       <select id="servicio" required>
         <option value="">-- Selecciona Servicio --</option>
-        <option>Corte de Pelo</option>
-        <option>Corte de Barba</option>
-        <option>Combo</option>
+        <option value="Corte de Pelo">Corte de Pelo</option>
+        <option value="Corte de Barba">Corte de Barba</option>
+        <option value="Combo">Combo</option>
       </select>
-      <select id="barbero" required>
+
+      <select id="barbero" required onchange="cargarHorarios()">
         <option value="">-- Selecciona Barbero --</option>
-        <option>Carlos</option>
-        <option>Martín</option>
-        <option>Fernando</option>
+        <option value="Carlos">Carlos</option>
+        <option value="Martín">Martín</option>
+        <option value="Fernando">Fernando</option>
       </select>
-      <div class="horarios">
-        <button type="button" onclick="book('10:00')">10:00</button>
-        <button type="button" class="agotado" disabled>10:30 (Agotado)</button>
-        <button type="button" onclick="book('11:00')">11:00</button>
-        <button type="button" onclick="book('11:30')">11:30</button>
-      </div>
+
+      <!-- Horarios dinámicos -->
+      <div class="horarios" id="horarios"></div>
     </form>
   </section>
-  <footer><p>© 2025 Boga’s Barbershop</p></footer>
+
+  <footer>
+    <p>© 2025 Boga’s Barbershop</p>
+  </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
