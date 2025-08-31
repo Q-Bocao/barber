@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.body.contains(document.getElementById("tabla-turnos"))) {
     cargarTurnos();
 
-    // 🔄 Auto-actualizar cada 10 segundos
+    // 🔄 Auto-actualizar cada 5 segundos (podés cambiar a 10000 para 10s)
     setInterval(cargarTurnos, 5000);
   }
 });
@@ -41,13 +41,16 @@ function book(hora) {
     fecha: new Date().toLocaleDateString("es-AR")
   };
 
-  // URL de tu Apps Script (POST)
-  fetch("https://script.google.com/macros/s/AKfycbzYGp8JnvD5kMwqQPiZRK8by48r_02i2eX-kvTAEmtHoCD9yu3GdEZnGwzZQteX1xYk/exec", {
+  // ✅ URL final de tu Apps Script (POST)
+  fetch("https://script.google.com/macros/s/AKfycbyLTDrPhUU0WYRWpZI0QcvOYkmN9Dv9CA1TlgIFogCybFpJwJ_xovnt1DAX0GqoSJmp/exec", {
     method: "POST",
     body: JSON.stringify(data)
   })
   .then(res => res.text())
-  .then(() => showMessage("✅ Turno reservado correctamente", "success"))
+  .then(() => {
+    showMessage("✅ Turno reservado correctamente", "success");
+    document.getElementById("form-reserva")?.reset(); // Limpia el form
+  })
   .catch(() => showMessage("❌ Error al reservar", "error"));
 }
 
@@ -62,7 +65,6 @@ function loginUser(e) {
   // 🔑 Usuarios de prueba
   if ((usuario === "admin" && clave === "1234") ||
       (usuario === "barbero" && clave === "abcd")) {
-    // Guardamos sesión en localStorage
     localStorage.setItem("usuario", usuario);
     window.location.href = "panel.html";
   } else {
@@ -75,7 +77,7 @@ function loginUser(e) {
 // -----------------------------
 function formatDate(fechaStr) {
   const fecha = new Date(fechaStr);
-  if (isNaN(fecha)) return fechaStr; // por si viene mal
+  if (isNaN(fecha)) return fechaStr;
   return fecha.toLocaleDateString("es-AR", {
     weekday: "long",
     year: "numeric",
@@ -97,7 +99,8 @@ function cargarTurnos(filtrar = false) {
   const tbody = document.querySelector("#tabla-turnos tbody");
   tbody.innerHTML = "<tr><td colspan='5'>⏳ Cargando turnos...</td></tr>";
 
-  fetch("https://script.google.com/macros/s/AKfycbzYGp8JnvD5kMwqQPiZRK8by48r_02i2eX-kvTAEmtHoCD9yu3GdEZnGwzZQteX1xYk/exec")
+  // ✅ URL final de tu Apps Script (GET)
+  fetch("https://script.google.com/macros/s/AKfycbyLTDrPhUU0WYRWpZI0QcvOYkmN9Dv9CA1TlgIFogCybFpJwJ_xovnt1DAX0GqoSJmp/exec")
     .then(res => res.json())
     .then(data => {
       tbody.innerHTML = "";
@@ -105,12 +108,10 @@ function cargarTurnos(filtrar = false) {
       const hoy = new Date().toLocaleDateString("es-AR");
       let turnos = data;
 
-      // 👉 Por defecto: solo turnos de hoy
       if (!filtrar) {
         turnos = data.filter(t => t.fecha === hoy);
       }
 
-      // Si hay filtros aplicados
       const filtroBarbero = document.getElementById("filtroBarbero")?.value;
       const filtroFecha = document.getElementById("filtroFecha")?.value;
 
