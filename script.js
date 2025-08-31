@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Si estamos en el panel, cargamos turnos
   if (document.body.contains(document.getElementById("tabla-turnos"))) {
     cargarTurnos();
+
+    // 🔄 Auto-actualizar cada 10 segundos
+    setInterval(cargarTurnos, 5000);
   }
 });
 
@@ -38,7 +41,7 @@ function book(hora) {
     fecha: new Date().toLocaleDateString("es-AR")
   };
 
-  // URL final de tu Apps Script (POST)
+  // URL de tu Apps Script (POST)
   fetch("https://script.google.com/macros/s/AKfycbzYGp8JnvD5kMwqQPiZRK8by48r_02i2eX-kvTAEmtHoCD9yu3GdEZnGwzZQteX1xYk/exec", {
     method: "POST",
     body: JSON.stringify(data)
@@ -70,27 +73,70 @@ function loginUser(e) {
 // -----------------------------
 // PANEL
 // -----------------------------
-function cargarTurnos() {
+function formatDate(fechaStr) {
+  const fecha = new Date(fechaStr);
+  if (isNaN(fecha)) return fechaStr; // por si viene mal
+  return fecha.toLocaleDateString("es-AR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+}
+
+function formatTime(horaStr) {
+  const fecha = new Date(horaStr);
+  if (isNaN(fecha)) return horaStr;
+  return fecha.toLocaleTimeString("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  }) + " hs";
+}
+
+function cargarTurnos(filtrar = false) {
   const tbody = document.querySelector("#tabla-turnos tbody");
   tbody.innerHTML = "<tr><td colspan='5'>⏳ Cargando turnos...</td></tr>";
 
-  // URL final de tu Apps Script (GET)
   fetch("https://script.google.com/macros/s/AKfycbzYGp8JnvD5kMwqQPiZRK8by48r_02i2eX-kvTAEmtHoCD9yu3GdEZnGwzZQteX1xYk/exec")
     .then(res => res.json())
     .then(data => {
       tbody.innerHTML = "";
-      if (data.length === 0) {
+
+      const hoy = new Date().toLocaleDateString("es-AR");
+      let turnos = data;
+
+      // 👉 Por defecto: solo turnos de hoy
+      if (!filtrar) {
+        turnos = data.filter(t => t.fecha === hoy);
+      }
+
+      // Si hay filtros aplicados
+      const filtroBarbero = document.getElementById("filtroBarbero")?.value;
+      const filtroFecha = document.getElementById("filtroFecha")?.value;
+
+      if (filtrar) {
+        if (filtroBarbero) {
+          turnos = turnos.filter(t => t.barbero === filtroBarbero);
+        }
+        if (filtroFecha) {
+          const fechaFormateada = new Date(filtroFecha).toLocaleDateString("es-AR");
+          turnos = turnos.filter(t => t.fecha === fechaFormateada);
+        }
+      }
+
+      if (turnos.length === 0) {
         tbody.innerHTML = "<tr><td colspan='5'>📭 No hay turnos registrados</td></tr>";
         return;
       }
-      data.forEach(t => {
+
+      turnos.forEach(t => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${t.nombre}</td>
           <td>${t.servicio}</td>
           <td>${t.barbero}</td>
-          <td>${t.hora}</td>
-          <td>${t.fecha}</td>
+          <td>${formatTime(t.hora)}</td>
+          <td>${formatDate(t.fecha)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -98,6 +144,13 @@ function cargarTurnos() {
     .catch(() => {
       tbody.innerHTML = "<tr><td colspan='5'>❌ Error al cargar los turnos</td></tr>";
     });
+}
+
+// -----------------------------
+// FILTRO
+// -----------------------------
+function aplicarFiltro() {
+  cargarTurnos(true);
 }
 
 // -----------------------------
