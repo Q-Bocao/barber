@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel - Boga’s Barbershop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="panel-header">
+    <h1>Panel de Turnos</h1>
+    <div class="filters">
+      <select id="filtro-barbero">
+        <option value="">-- Filtrar por Barbero --</option>
+        <option>Carlos</option>
+        <option>Martín</option>
+        <option>Fernando</option>
+      </select>
+      <input type="date" id="filtro-fecha">
+    </div>
+  </header>
+
+  <section class="panel-content">
+    <table id="tabla-turnos">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Servicio</th>
+          <th>Barbero</th>
+          <th>Hora</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="5">Cargando turnos...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>© 2025 Boga’s Barbershop</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
