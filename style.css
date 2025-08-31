@@ -248,3 +248,60 @@ footer {
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* LOGIN */
+.login-container {
+  max-width: 400px;
+  margin: 10vh auto;
+  padding: 2rem;
+  background: #1a1a1a;
+  border: 1px solid gold;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.45);
+}
+.login-container h1 {
+  font-family: 'Playfair Display', serif;
+  color: gold;
+}
+.login-container input {
+  width: 100%;
+  padding: .8rem;
+  margin: .5rem 0;
+  border-radius: 8px;
+  border: 1px solid gold;
+  background: #0b0b0b;
+  color: #fff;
+}
+#login-msg {
+  margin-top: 1rem;
+  font-size: .9rem;
+  color: #f44336;
+}
+
+/* PANEL */
+.panel-header {
+  background: #1a1a1a;
+  padding: 1rem;
+  border-bottom: 2px solid gold;
+}
+.panel-header h1 {
+  color: gold;
+}
+.filters {
+  margin-top: .5rem;
+}
+.panel-content {
+  padding: 2rem;
+}
+#tabla-turnos {
+  width: 100%;
+  border-collapse: collapse;
+}
+#tabla-turnos th, #tabla-turnos td {
+  border: 1px solid gold;
+  padding: .6rem;
+}
+#tabla-turnos th {
+  background: #111;
+  color: gold;
+}
