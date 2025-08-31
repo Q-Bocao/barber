@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.body.contains(document.getElementById("tabla-turnos"))) {
     cargarTurnos();
 
-    // 🔄 Auto-actualizar cada 5 segundos (podés cambiar a 10000 para 10s)
+    // 🔄 Auto-actualizar cada 5 segundos
     setInterval(cargarTurnos, 5000);
   }
 });
@@ -38,11 +38,15 @@ function book(hora) {
     servicio: selectedService,
     barbero: barbero,
     hora: hora,
-    fecha: new Date().toLocaleDateString("es-AR")
+    fecha: new Date().toLocaleDateString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    })
   };
 
   // ✅ URL final de tu Apps Script (POST)
-  fetch("https://script.google.com/macros/s/AKfycbyLTDrPhUU0WYRWpZI0QcvOYkmN9Dv9CA1TlgIFogCybFpJwJ_xovnt1DAX0GqoSJmp/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec", {
     method: "POST",
     body: JSON.stringify(data)
   })
@@ -87,6 +91,11 @@ function formatDate(fechaStr) {
 }
 
 function formatTime(horaStr) {
+  // Si viene como string directo (ejemplo "10:00"), lo mostramos sin convertir
+  if (/^\d{1,2}:\d{2}$/.test(horaStr)) {
+    return horaStr + " hs";
+  }
+
   const fecha = new Date(horaStr);
   if (isNaN(fecha)) return horaStr;
   return fecha.toLocaleTimeString("es-AR", {
@@ -100,18 +109,24 @@ function cargarTurnos(filtrar = false) {
   tbody.innerHTML = "<tr><td colspan='5'>⏳ Cargando turnos...</td></tr>";
 
   // ✅ URL final de tu Apps Script (GET)
-  fetch("https://script.google.com/macros/s/AKfycbyLTDrPhUU0WYRWpZI0QcvOYkmN9Dv9CA1TlgIFogCybFpJwJ_xovnt1DAX0GqoSJmp/exec")
+  fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec")
     .then(res => res.json())
     .then(data => {
       tbody.innerHTML = "";
 
-      const hoy = new Date().toLocaleDateString("es-AR");
+      const hoy = new Date().toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
       let turnos = data;
 
+      // 👉 Por defecto: solo turnos de hoy
       if (!filtrar) {
         turnos = data.filter(t => t.fecha === hoy);
       }
 
+      // Si hay filtros aplicados
       const filtroBarbero = document.getElementById("filtroBarbero")?.value;
       const filtroFecha = document.getElementById("filtroFecha")?.value;
 
@@ -120,7 +135,11 @@ function cargarTurnos(filtrar = false) {
           turnos = turnos.filter(t => t.barbero === filtroBarbero);
         }
         if (filtroFecha) {
-          const fechaFormateada = new Date(filtroFecha).toLocaleDateString("es-AR");
+          const fechaFormateada = new Date(filtroFecha).toLocaleDateString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          });
           turnos = turnos.filter(t => t.fecha === fechaFormateada);
         }
       }
