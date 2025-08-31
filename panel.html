@@ -3,25 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel - Boga’s Barbershop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>Panel de Turnos</title>
   <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <header class="panel-header">
+  <header>
     <h1>Panel de Turnos</h1>
-    <div class="filters">
-      <select id="filtro-barbero">
-        <option value="">-- Filtrar por Barbero --</option>
-        <option>Carlos</option>
-        <option>Martín</option>
-        <option>Fernando</option>
-      </select>
-      <input type="date" id="filtro-fecha">
-    </div>
   </header>
 
-  <section class="panel-content">
+  <main>
+    <!-- 🔎 FILTROS -->
+    <div class="filtros">
+      <select id="filtroBarbero">
+        <option value="">-- Filtrar por Barbero --</option>
+        <option value="Carlos">Carlos</option>
+        <option value="Martín">Martín</option>
+        <option value="Iris">Iris</option>
+      </select>
+
+      <input type="date" id="filtroFecha">
+      <button onclick="aplicarFiltro()">Buscar</button>
+    </div>
+
+    <!-- 📋 TABLA DE TURNOS -->
     <table id="tabla-turnos">
       <thead>
         <tr>
@@ -33,15 +38,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td colspan="5">Cargando turnos...</td></tr>
+        <tr><td colspan="5">⏳ Cargando turnos...</td></tr>
       </tbody>
     </table>
-  </section>
+  </main>
 
   <footer>
-    <p>© 2025 Boga’s Barbershop</p>
+    <p>JUCA® Boga’s Barbershop</p>
   </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
