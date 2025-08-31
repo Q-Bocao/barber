@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Panel de Turnos</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
   <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
+  <header class="panel-header">
     <h1>Panel de Turnos</h1>
-  </header>
-
-  <main>
-    <!-- 🔎 FILTROS -->
-    <div class="filtros">
+    <div class="filters">
       <select id="filtroBarbero">
         <option value="">-- Filtrar por Barbero --</option>
         <option value="Carlos">Carlos</option>
         <option value="Martín">Martín</option>
-        <option value="Iris">Iris</option>
+        <option value="Fernando">Fernando</option>
       </select>
-
-      <input type="date" id="filtroFecha">
+      <input type="date" id="filtroFecha"/>
       <button onclick="aplicarFiltro()">Buscar</button>
     </div>
+  </header>
 
-    <!-- 📋 TABLA DE TURNOS -->
+  <main class="panel-content">
     <table id="tabla-turnos">
       <thead>
         <tr>
@@ -43,8 +39,6 @@
     </table>
   </main>
 
-  <footer>
-    <p>JUCA® Boga’s Barbershop</p>
-  </footer>
+  <div id="msg-container"></div>
 </body>
 </html>
