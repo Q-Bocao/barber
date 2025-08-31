@@ -10,6 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedService = e.target.value;
     });
   }
+
+  // Si estamos en el panel, cargamos turnos
+  if (document.body.contains(document.getElementById("tabla-turnos"))) {
+    cargarTurnos();
+  }
 });
 
 function book(hora) {
@@ -33,8 +38,8 @@ function book(hora) {
     fecha: new Date().toLocaleDateString("es-AR")
   };
 
-  // 👉 Reemplazá con la URL de tu Apps Script publicado como Web App
-  fetch("https://script.google.com/macros/s/TU_URL_AQUI/exec", {
+  // URL final de tu Apps Script (POST)
+  fetch("https://script.google.com/macros/s/AKfycbzYGp8JnvD5kMwqQPiZRK8by48r_02i2eX-kvTAEmtHoCD9yu3GdEZnGwzZQteX1xYk/exec", {
     method: "POST",
     body: JSON.stringify(data)
   })
@@ -65,36 +70,34 @@ function loginUser(e) {
 // -----------------------------
 // PANEL
 // -----------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.body.contains(document.getElementById("tabla-turnos"))) {
-    cargarTurnos();
-  }
-});
-
 function cargarTurnos() {
   const tbody = document.querySelector("#tabla-turnos tbody");
   tbody.innerHTML = "<tr><td colspan='5'>⏳ Cargando turnos...</td></tr>";
 
-  // 👉 Simulación (más adelante lo conectamos con Google Sheets)
-  setTimeout(() => {
-    const data = [
-      { nombre: "Juan Pérez", servicio: "Corte de Pelo", barbero: "Carlos", hora: "10:00", fecha: "2025-08-30" },
-      { nombre: "Luis Gómez", servicio: "Barba", barbero: "Martín", hora: "11:30", fecha: "2025-08-30" },
-    ];
-
-    tbody.innerHTML = "";
-    data.forEach(t => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${t.nombre}</td>
-        <td>${t.servicio}</td>
-        <td>${t.barbero}</td>
-        <td>${t.hora}</td>
-        <td>${t.fecha}</td>
-      `;
-      tbody.appendChild(tr);
+  // URL final de tu Apps Script (GET)
+  fetch("https://script.google.com/macros/s/AKfycbzYGp8JnvD5kMwqQPiZRK8by48r_02i2eX-kvTAEmtHoCD9yu3GdEZnGwzZQteX1xYk/exec")
+    .then(res => res.json())
+    .then(data => {
+      tbody.innerHTML = "";
+      if (data.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>📭 No hay turnos registrados</td></tr>";
+        return;
+      }
+      data.forEach(t => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${t.nombre}</td>
+          <td>${t.servicio}</td>
+          <td>${t.barbero}</td>
+          <td>${t.hora}</td>
+          <td>${t.fecha}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(() => {
+      tbody.innerHTML = "<tr><td colspan='5'>❌ Error al cargar los turnos</td></tr>";
     });
-  }, 1000);
 }
 
 // -----------------------------
