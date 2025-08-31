@@ -1,0 +1,1 @@
+console.log('Script base listo, agregar lógica de reservas');
