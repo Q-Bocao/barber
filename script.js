@@ -14,11 +14,58 @@ document.addEventListener("DOMContentLoaded", () => {
   // Si estamos en el panel, cargamos turnos
   if (document.body.contains(document.getElementById("tabla-turnos"))) {
     cargarTurnos();
-
-    // 🔄 Auto-actualizar cada 5 segundos
-    setInterval(cargarTurnos, 5000);
+    setInterval(cargarTurnos, 5000); // auto-refresh
   }
 });
+
+function cargarHorarios() {
+  const barbero = document.getElementById("barbero").value;
+  const horariosDiv = document.getElementById("horarios");
+  horariosDiv.innerHTML = "";
+
+  if (!barbero) return;
+
+  // Generar horarios de 10:00 a 20:00 (cada 30 min)
+  const horarios = [];
+  for (let h = 10; h <= 20; h++) {
+    horarios.push(`${h}:00`);
+    if (h < 20) horarios.push(`${h}:30`);
+  }
+
+  // Obtener turnos ya ocupados desde Google Sheets
+  fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec")
+    .then(res => res.json())
+    .then(data => {
+      const hoy = new Date().toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+
+      const ocupados = data
+        .filter(t => t.barbero === barbero && t.fecha === hoy)
+        .map(t => t.hora);
+
+      horarios.forEach(hora => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+
+        if (ocupados.includes(hora)) {
+          btn.textContent = `${hora} (Agotado)`;
+          btn.disabled = true;
+          btn.classList.add("agotado");
+        } else {
+          btn.textContent = hora;
+          btn.onclick = () => book(hora);
+        }
+
+        horariosDiv.appendChild(btn);
+      });
+    })
+    .catch(() => {
+      showMessage("❌ Error al cargar horarios", "error");
+    });
+}
 
 function book(hora) {
   const nombre = document.getElementById("nombre")?.value;
@@ -45,7 +92,7 @@ function book(hora) {
     })
   };
 
-  // ✅ URL final de tu Apps Script (POST)
+  // ✅ URL de tu Apps Script
   fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec", {
     method: "POST",
     body: JSON.stringify(data)
@@ -53,7 +100,8 @@ function book(hora) {
   .then(res => res.text())
   .then(() => {
     showMessage("✅ Turno reservado correctamente", "success");
-    document.getElementById("form-reserva")?.reset(); // Limpia el form
+    document.getElementById("form-reserva")?.reset();
+    cargarHorarios(); // refresca horarios y bloquea el recién reservado
   })
   .catch(() => showMessage("❌ Error al reservar", "error"));
 }
@@ -66,7 +114,6 @@ function loginUser(e) {
   const usuario = document.getElementById("usuario").value;
   const clave = document.getElementById("clave").value;
 
-  // 🔑 Usuarios de prueba
   if ((usuario === "admin" && clave === "1234") ||
       (usuario === "barbero" && clave === "abcd")) {
     localStorage.setItem("usuario", usuario);
@@ -91,11 +138,7 @@ function formatDate(fechaStr) {
 }
 
 function formatTime(horaStr) {
-  // Si viene como string directo (ejemplo "10:00"), lo mostramos sin convertir
-  if (/^\d{1,2}:\d{2}$/.test(horaStr)) {
-    return horaStr + " hs";
-  }
-
+  if (/^\d{1,2}:\d{2}$/.test(horaStr)) return horaStr + " hs";
   const fecha = new Date(horaStr);
   if (isNaN(fecha)) return horaStr;
   return fecha.toLocaleTimeString("es-AR", {
@@ -106,9 +149,10 @@ function formatTime(horaStr) {
 
 function cargarTurnos(filtrar = false) {
   const tbody = document.querySelector("#tabla-turnos tbody");
+  if (!tbody) return;
+
   tbody.innerHTML = "<tr><td colspan='5'>⏳ Cargando turnos...</td></tr>";
 
-  // ✅ URL final de tu Apps Script (GET)
   fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec")
     .then(res => res.json())
     .then(data => {
@@ -121,19 +165,22 @@ function cargarTurnos(filtrar = false) {
       });
       let turnos = data;
 
-      // 👉 Por defecto: solo turnos de hoy
       if (!filtrar) {
-        turnos = data.filter(t => t.fecha === hoy);
+        turnos = data.filter(t => {
+          const fechaTurno = new Date(t.fecha).toLocaleDateString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          });
+          return fechaTurno === hoy;
+        });
       }
 
-      // Si hay filtros aplicados
       const filtroBarbero = document.getElementById("filtroBarbero")?.value;
       const filtroFecha = document.getElementById("filtroFecha")?.value;
 
       if (filtrar) {
-        if (filtroBarbero) {
-          turnos = turnos.filter(t => t.barbero === filtroBarbero);
-        }
+        if (filtroBarbero) turnos = turnos.filter(t => t.barbero === filtroBarbero);
         if (filtroFecha) {
           const fechaFormateada = new Date(filtroFecha).toLocaleDateString("es-AR", {
             day: "2-digit",
@@ -166,9 +213,6 @@ function cargarTurnos(filtrar = false) {
     });
 }
 
-// -----------------------------
-// FILTRO
-// -----------------------------
 function aplicarFiltro() {
   cargarTurnos(true);
 }
@@ -190,7 +234,5 @@ function showMessage(msg, type) {
   div.innerHTML = msg;
   container.appendChild(div);
 
-  setTimeout(() => {
-    div.remove();
-  }, 3000);
+  setTimeout(() => div.remove(), 3000);
 }
