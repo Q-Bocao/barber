@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Si estamos en el panel, cargamos turnos
   if (document.body.contains(document.getElementById("tabla-turnos"))) {
     cargarTurnos();
-    setInterval(cargarTurnos, 5000); // auto-refresh
+    setInterval(cargarTurnos, 5000); // auto-refresh cada 5s
   }
 });
 
@@ -33,7 +33,7 @@ function cargarHorarios() {
   }
 
   // Obtener turnos ya ocupados desde Google Sheets
-  fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec")
+  fetch("https://script.google.com/macros/s/AKfycbwIIlRrbiR7yeT6FWo9NuE5q4IDCYL-7IRrlaMsszxzuLXLNrxyyXfuCIHz-_8JUSo2/exec")
     .then(res => res.json())
     .then(data => {
       const hoy = new Date().toLocaleDateString("es-AR", {
@@ -92,8 +92,8 @@ function book(hora) {
     })
   };
 
-  // ✅ URL de tu Apps Script
-  fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec", {
+  // ✅ URL de tu Apps Script (POST)
+  fetch("https://script.google.com/macros/s/AKfycbwIIlRrbiR7yeT6FWo9NuE5q4IDCYL-7IRrlaMsszxzuLXLNrxyyXfuCIHz-_8JUSo2/exec", {
     method: "POST",
     body: JSON.stringify(data)
   })
@@ -153,7 +153,8 @@ function cargarTurnos(filtrar = false) {
 
   tbody.innerHTML = "<tr><td colspan='5'>⏳ Cargando turnos...</td></tr>";
 
-  fetch("https://script.google.com/macros/s/AKfycbyaboJj1_ZlNjvMNhtvPyj91Gh3J34yUI0EnetIDZZw5q6zOBWg7FLrTJUx7CLegLqB/exec")
+  // ✅ URL de tu Apps Script (GET)
+  fetch("https://script.google.com/macros/s/AKfycbwIIlRrbiR7yeT6FWo9NuE5q4IDCYL-7IRrlaMsszxzuLXLNrxyyXfuCIHz-_8JUSo2/exec")
     .then(res => res.json())
     .then(data => {
       tbody.innerHTML = "";
